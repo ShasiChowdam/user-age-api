@@ -8,3 +8,4 @@ sql:
       go:
         package: "sqlc"
         out: "sqlc"
+        sql_package: "pgx/v5"

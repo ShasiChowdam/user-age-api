@@ -5,7 +5,12 @@ import (
 
 	"github.com/ShasiChowdam/user-age-api/config"
 	loggerpkg "github.com/ShasiChowdam/user-age-api/internal/logger"
-
+	"github.com/ShasiChowdam/user-age-api/db/sqlc"
+	"github.com/ShasiChowdam/user-age-api/internal/handler"
+	"github.com/ShasiChowdam/user-age-api/internal/repository"
+	"github.com/ShasiChowdam/user-age-api/internal/routes"
+	"github.com/ShasiChowdam/user-age-api/internal/service"
+	"github.com/ShasiChowdam/user-age-api/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -28,15 +33,21 @@ func main() {
 	}
 	defer db.Close()
 
+	queries := sqlc.New(db)
+
+	userRepo := repository.NewUserRepository(queries)
+
+	userService := service.NewUserService(userRepo)
+
+	userHandler := handler.NewUserHandler(userService)
+
 	appLogger.Info("Database connected successfully")
 
 	app := fiber.New()
+	app.Use(middleware.RequestID())
+	app.Use(middleware.RequestLogger())
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "User Age API Running",
-		})
-	})
+	routes.SetupRoutes(app, userHandler)
 
 	appLogger.Info(
 		"Server started",
