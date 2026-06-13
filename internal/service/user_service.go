@@ -113,3 +113,55 @@ func (s *UserService) DeleteUser(
 ) error {
 	return s.repo.DeleteUser(ctx, id)
 }
+
+func (s *UserService) ListUsersPaginated(
+	ctx context.Context,
+	page int,
+	limit int,
+) (models.PaginatedUsersResponse, error) {
+
+	if page < 1 {
+		page = 1
+	}
+
+	if limit < 1 {
+		limit = 10
+	}
+
+	offset := (page - 1) * limit
+
+	users, err := s.repo.ListUsersPaginated(
+		ctx,
+		int32(limit),
+		int32(offset),
+	)
+	if err != nil {
+		return models.PaginatedUsersResponse{}, err
+	}
+
+	total, err := s.repo.CountUsers(ctx)
+	if err != nil {
+		return models.PaginatedUsersResponse{}, err
+	}
+
+	var response []models.UserWithAgeResponse
+
+	for _, user := range users {
+
+		response = append(response,
+			models.UserWithAgeResponse{
+				ID:   user.ID,
+				Name: user.Name,
+				DOB:  user.Dob.Time.Format("2006-01-02"),
+				Age:  CalculateAge(user.Dob.Time),
+			},
+		)
+	}
+
+	return models.PaginatedUsersResponse{
+		Page:  page,
+		Limit: limit,
+		Total: total,
+		Users: response,
+	}, nil
+}

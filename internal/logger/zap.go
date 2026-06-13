@@ -2,6 +2,12 @@ package logger
 
 import "go.uber.org/zap"
 
-func NewLogger() (*zap.Logger, error) {
-	return zap.NewProduction()
+var Log *zap.Logger
+
+func Init() error {
+	var err error
+
+	Log, err = zap.NewProduction()
+
+	return err
 }

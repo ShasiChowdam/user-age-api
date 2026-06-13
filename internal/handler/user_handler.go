@@ -82,14 +82,32 @@ func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
-	users, err := h.service.ListUsers(c.Context())
+
+	page, err := strconv.Atoi(c.Query("page", "1"))
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		page = 1
 	}
 
-	return c.JSON(users)
+	limit, err := strconv.Atoi(c.Query("limit", "10"))
+	if err != nil {
+		limit = 10
+	}
+
+	response, err := h.service.ListUsersPaginated(
+		c.Context(),
+		page,
+		limit,
+	)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			fiber.Map{
+				"error": err.Error(),
+			},
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {

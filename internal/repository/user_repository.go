@@ -49,3 +49,25 @@ func (r *UserRepository) DeleteUser(
 ) error {
 	return r.queries.DeleteUser(ctx, id)
 }
+
+func (r *UserRepository) ListUsersPaginated(
+	ctx context.Context,
+	limit int32,
+	offset int32,
+) ([]sqlc.User, error) {
+
+	return r.queries.ListUsersPaginated(
+		ctx,
+		sqlc.ListUsersPaginatedParams{
+			Limit:  limit,
+			Offset: offset,
+		},
+	)
+}
+
+func (r *UserRepository) CountUsers(
+	ctx context.Context,
+) (int64, error) {
+
+	return r.queries.CountUsers(ctx)
+}

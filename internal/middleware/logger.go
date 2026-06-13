@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"log"
 	"time"
 
+	"github.com/ShasiChowdam/user-age-api/internal/logger"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 func RequestLogger() fiber.Handler {
@@ -16,12 +17,12 @@ func RequestLogger() fiber.Handler {
 
 		duration := time.Since(start)
 
-		log.Printf(
-			"%s %s - %v",
-			c.Method(),
-			c.Path(),
-			duration,
-		)
+		logger.Log.Info(
+	"Request completed",
+	zap.String("method", c.Method()),
+	zap.String("path", c.Path()),
+	zap.Duration("duration", duration),
+)
 
 		return err
 	}

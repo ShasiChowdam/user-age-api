@@ -4,12 +4,25 @@ VALUES ($1, $2)
 RETURNING *;
 
 -- name: GetUserByID :one
-SELECT * FROM users
+SELECT *
+FROM users
 WHERE id = $1;
 
 -- name: ListUsers :many
-SELECT * FROM users
+SELECT *
+FROM users
 ORDER BY id;
+
+-- name: ListUsersPaginated :many
+SELECT *
+FROM users
+ORDER BY id
+LIMIT $1
+OFFSET $2;
+
+-- name: CountUsers :one
+SELECT COUNT(*)
+FROM users;
 
 -- name: UpdateUser :one
 UPDATE users
