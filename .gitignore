@@ -13,7 +13,8 @@ bin/
 
 # Environment
 .env
-
+.env.local
+.env.docker
 # IDE
 .vscode/
 .idea/
